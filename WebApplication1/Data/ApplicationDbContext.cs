@@ -13,14 +13,16 @@ namespace WebApplication1.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<firstModel>().HasData(
-                    new firstModel{
-                    Id = 1,
-                    Name = "ABC",
-                    Description = "I'm the first person",
-                    Path = "Null"
-                },
+                    new firstModel
+                    {
+                        Id = 1,
+                        Name = "ABC",
+                        Description = "I'm the first person",
+                        Path = "Null"
+                    },
 
-                new firstModel{
+                new firstModel
+                {
                     Id = 2,
                     Name = "DEF",
                     Description = "I'm the Second person",

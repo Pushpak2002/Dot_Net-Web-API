@@ -16,6 +16,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 });
 
 
+//// Add CORS policy
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowReactApp",
+//        builder =>
+//        {
+//            builder.WithOrigins("http://localhost:3000") // Specify the React app URL
+//                   .AllowAnyMethod()                  // Allow any HTTP method
+//                   .AllowAnyHeader();                 // Allow any header
+//        });
+//});
+
 
 var app = builder.Build();
 
@@ -25,6 +37,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
 app.UseHttpsRedirection();
 

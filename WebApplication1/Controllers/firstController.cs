@@ -27,7 +27,7 @@ namespace WebApplication1.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<firstModel>> getfirst()
         {
-            
+
             return Ok(_db._firstModel.ToList());
         }
 
@@ -78,7 +78,7 @@ namespace WebApplication1.Controllers
                 return BadRequest();
             }
 
-            if(_first.Id <= 0)
+            if (_first.Id <= 0)
             {
                 return BadRequest();
             }
@@ -95,13 +95,13 @@ namespace WebApplication1.Controllers
             _db._firstModel.Add(f);
             _db.SaveChanges();
             //return Ok(_firstModel);
-            return CreatedAtRoute("GetAllData",_first);
+            return NoContent();
         }
 
 
         // Delete Data
 
-        [HttpDelete("{id:int}", Name = "DeleteVillaById")]
+        [HttpDelete("{id:int}", Name = "DeleteById")]
         public IActionResult DeleteFirst(int id)
         {
             if (id == 0)
@@ -121,31 +121,41 @@ namespace WebApplication1.Controllers
 
 
         // Update data
-        //[HttpPut("{id:int}", Name = "UpdateFirstById")]
-        [HttpPut]
-        public IActionResult UpdateFist(int id, [FromBody]firstModel _firstModel)
+        //[HttpPut("{id:int}", Name = "UpdateFirstById")][HttpPut]
+        [HttpPut("update/{id}")]
+        public IActionResult UpdateFist(int id, [FromBody] firstModel _firstModel)
         {
             if (_firstModel == null || id != _firstModel.Id)
             {
-                return BadRequest();
+                return BadRequest("Invalid data provided.");
             }
 
-
-            firstModel f = new()
+            // Check if the record exists in the database
+            var existingRecord = _db._firstModel.FirstOrDefault(f => f.Id == id);
+            if (existingRecord == null)
             {
-                Id = _firstModel.Id,
-                Name = _firstModel.Name,
-                Description = _firstModel.Description,
-                Path = _firstModel.Path
-            };
+                return NotFound($"Record with id {id} not found.");
+            }
 
-            _db._firstModel.Update(f);
-            _db.SaveChanges();
+            // Update the fields
+            existingRecord.Name = _firstModel.Name;
+            existingRecord.Description = _firstModel.Description;
+            existingRecord.Path = _firstModel.Path;
+
+            try
+            {
+                _db._firstModel.Update(existingRecord);
+                _db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                // Log exception if needed
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error updating data.");
+            }
 
             return NoContent();
-
-
         }
+
 
 
         // Upload File
@@ -161,13 +171,13 @@ namespace WebApplication1.Controllers
 
             var path = new UploadController().Upload(file);
 
-            if(data.Path == "")
+            if (data.Path == "")
             {
                 data.Path = data.Path + path;
             }
             else
                 data.Path = data.Path + "," + path;
-           
+
             _db._firstModel.Update(data);
             _db.SaveChanges();
             return NoContent();
