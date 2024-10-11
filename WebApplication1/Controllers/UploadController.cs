@@ -28,9 +28,8 @@
             string newPath = Directory.GetCurrentDirectory() + "Uploads";
             using FileStream stream = new FileStream(Path.Combine(path, fileName), FileMode.Create);
             file.CopyTo(stream);
-
-            //return fileName
-            return newPath;
+            Console.WriteLine(newPath);
+            return fileName;
         }
     }
 }

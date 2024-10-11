@@ -143,6 +143,7 @@ const ShowForm = () => {
                         <th>ID</th>
                         <th>Name</th>
                         <th>Description</th>
+                        <th>Images</th>
                         <th>Actions</th> {/* Add Actions header */}
                     </tr>
                 </thead>
@@ -172,6 +173,15 @@ const ShowForm = () => {
                                     item.description
                                 )}
                             </td>
+                            <td>
+                                {/*C:\Users\kambl\source\repos\WebApplication1\WebApplication1\Uploads\*/}
+                                {editId === item.id ? (
+                                    <img src={`Uploads/${item.path}`} alt={item.path} />
+                                ) : (
+                                    item.path
+                                )}
+                            </td>
+
                             <td>
                                 {editId === item.id ? (
                                     <button className="btn btn-success" onClick={() => updateDataById(item.id)}>Save</button>

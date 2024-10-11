@@ -160,7 +160,7 @@ namespace WebApplication1.Controllers
 
         // Upload File
 
-        [HttpPut("{id:int}", Name = "UploadFile")]
+        [HttpPut("uploadFile/{id}", Name = "UploadFile")]
         public IActionResult UploadFile(int id, IFormFile file)
         {
             var data = _db._firstModel.FirstOrDefault(u => u.Id == id);
