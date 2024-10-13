@@ -6,6 +6,10 @@ import "react-toastify/dist/ReactToastify.css";
 import "./css/Dashboard.css"; // Ensure your CSS is correctly linked
 import config from "../../src/config/config.json";
 
+// import XLSX from "xlsx";
+import * as XLSX from "xlsx";
+
+
 const User = () => {
   // State variables
   const [tableData, setTableData] = useState([]); // Save all user info
@@ -239,6 +243,16 @@ const User = () => {
     </tr>
   ));
 
+  //Export data
+  const handleOnExport = () =>{
+      var wb = XLSX.utils.book_new(),
+      ws = XLSX.utils.json_to_sheet(tableData);
+
+      XLSX.utils.book_append_sheet(wb,ws,"UserSheet");
+
+      XLSX.writeFile(wb,"UserExcel.xlsx");
+  }
+
 
 
   return (
@@ -376,6 +390,8 @@ const User = () => {
                     {showAddUserForm ? "Close Form" : "Create New User"}{" "}
                     <span className="las la-user"></span>
                   </button>
+
+                  <button onClick={handleOnExport}>Download Data</button>
                 </div>
 
                 {/* Add User Form */}
