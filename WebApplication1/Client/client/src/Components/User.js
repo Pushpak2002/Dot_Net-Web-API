@@ -8,7 +8,8 @@ import config from "../../src/config/config.json";
 
 // import XLSX from "xlsx";
 import * as XLSX from "xlsx";
-
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const User = () => {
   // State variables
@@ -254,6 +255,42 @@ const User = () => {
   }
 
 
+  const generatePDF = () => {
+    const input = document.getElementById("user-table"); // Get the table by ID
+    if (!input) {
+      toast.error("Table not found!");
+      return;
+    }
+
+    html2canvas(input)
+      .then((canvas) => {
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 210; // A4 width in mm
+        const pageHeight = 297; // A4 height in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+
+        pdf.save("UserData.pdf");
+      })
+      .catch((error) => {
+        console.error("Error generating PDF:", error);
+        toast.error("Failed to generate PDF.");
+      });
+  };
+
+
 
   return (
     <div>
@@ -391,7 +428,8 @@ const User = () => {
                     <span className="las la-user"></span>
                   </button>
 
-                  <button onClick={handleOnExport}>Download Data</button>
+                  <button onClick={handleOnExport}>Download Excel Data</button>
+                  <button onClick={generatePDF}>Download PDF Data</button>
                 </div>
 
                 {/* Add User Form */}
@@ -505,7 +543,7 @@ const User = () => {
 
                 <div className="card-body">
                   <div className="table-responsive">
-                    <table width="100%">
+                    <table id="user-table" width="100%">
                       <thead>
                         <tr>
                           <th>Id</th>
