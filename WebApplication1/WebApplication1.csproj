@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Client\client\src\config\" />
     <Folder Include="Uploads\" />
   </ItemGroup>
 

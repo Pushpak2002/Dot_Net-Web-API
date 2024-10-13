@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using WebApplication1.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,20 +17,24 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 });
 
 
-//// Add CORS policy
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("AllowReactApp",
-//        builder =>
-//        {
-//            builder.WithOrigins("http://localhost:3000") // Specify the React app URL
-//                   .AllowAnyMethod()                  // Allow any HTTP method
-//                   .AllowAnyHeader();                 // Allow any header
-//        });
-//});
-
 
 var app = builder.Build();
+//app.UseStaticFiles();
+
+
+// Static File Uploader
+
+app.UseStaticFiles();// For the wwwroot folder
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+            Path.Combine(Directory.GetCurrentDirectory(), "Uploads")),
+    RequestPath = "/Uploads"
+});
+app.UseRouting();
+
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

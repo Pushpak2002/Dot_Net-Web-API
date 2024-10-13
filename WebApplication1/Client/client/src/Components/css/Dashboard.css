@@ -2,7 +2,7 @@
 
 
 :root {
-    --main-color: #DD2F6E;
+    --main-color: #150167;
     --color-dark: #1D2231;
     --text-grey: #8390A2;
 }
@@ -114,6 +114,7 @@ header {
     top: 0;
     z-index: 100;
     transition: left 300ms;
+    background-color: white;
 }
 
 #nav-toggle {
@@ -383,3 +384,69 @@ td {
         grid-template-columns: 100%;
     }
 }
+
+
+
+
+/* Add User Form Styles */
+.add-user-form {
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    margin-top: 20px;
+    transition: max-height 0.5s ease, opacity 0.5s ease;
+    overflow: hidden;
+}
+
+/* Flex container for the form fields */
+.form-fields {
+    display: flex; /* Use flexbox to align items */
+    gap: 20px; /* Add space between fields */
+    margin-bottom: 15px; /* Space below the fields */
+}
+
+.form-field {
+    flex: 1; /* Allow fields to take equal space */
+}
+
+    .form-field label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .form-field input {
+        width: 100%; /* Full width of the parent container */
+        padding: 8px;
+        box-sizing: border-box;
+    }
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Button styles remain the same */
+.btn {
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.btn-primary {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #f44336;
+    color: white;
+}
+
+/* Optional: Add some spacing below the form */
+.card-body {
+    padding: 20px;
+}
+
+

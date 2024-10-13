@@ -5,7 +5,7 @@
         public string Upload(IFormFile file)
         {
             //extension 
-            List<string> validExtensions = new List<string>() { ".jpg", ".jpeg", ".gif" };
+            List<string> validExtensions = new List<string>() { ".jpg", ".jpeg", ".gif",".png" };
 
             string extension = Path.GetExtension(file.FileName);
 
@@ -23,6 +23,7 @@
             }
 
             //name Changing
+
             string fileName = Guid.NewGuid().ToString() + extension;
             string path = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
             string newPath = Directory.GetCurrentDirectory() + "Uploads";

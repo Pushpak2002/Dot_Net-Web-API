@@ -95,7 +95,8 @@ namespace WebApplication1.Controllers
             _db._firstModel.Add(f);
             _db.SaveChanges();
             //return Ok(_firstModel);
-            return NoContent();
+            //return NoContent();
+            return CreatedAtAction(nameof(AddFirst), new { id = f.Id }, f);
         }
 
 
@@ -181,10 +182,9 @@ namespace WebApplication1.Controllers
             _db._firstModel.Update(data);
             _db.SaveChanges();
             return NoContent();
-
-
             //return Ok(new UploadController().Upload(file));
         }
+
 
 
 
