@@ -450,3 +450,99 @@ td {
 }
 
 
+/* For images in the update form */
+form img {
+    margin: 5px;
+    width: 15%;
+    transition: transform 0.3s ease-in-out; /* Smooth zoom effect */
+  }
+  
+  form img:hover {
+    transform: scale(5); /* Increase size on hover */
+    z-index: 10; /* Ensures it stays on top of other elements */
+  }
+  
+  /* For images in the tableData */
+  .table-img {
+    margin: 5px;
+    width: 50px; /* Default size for table images */
+    transition: transform 0.3s ease-in-out; /* Smooth zoom effect */
+  }
+  
+  .table-img:hover {
+    transform: scale(3); /* Increase size on hover */
+    z-index: 10; /* Ensures it stays on top of other elements */
+  }
+  
+
+
+/* Images */
+.image-container {
+    position: relative;
+    display: inline-block;
+    margin: 5px;
+  }
+  
+  img {
+    width: 15%;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .remove-image {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: rgba(255, 0, 0, 0.7);
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 18px;
+    line-height: 12px;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    z-index: 1;
+  }
+  
+  .remove-image:hover {
+    background-color: rgba(255, 0, 0, 0.9);
+  }
+
+  
+  .card-header button:hover{
+    background-color: rgba(88, 62, 236, 0.9);
+  }
+
+
+  /* //Delete Window */
+
+  .delete-window-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top */
+  }
+  
+  .delete-window {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .delete-window-buttons {
+    margin-top: 20px;
+  }
+  
+  .delete-window-buttons button {
+    margin: 0 10px;
+  }
+  

@@ -5,6 +5,8 @@ import "react-toastify/dist/ReactToastify.css";
 // import { Link } from 'react-router-dom';
 import "./css/Dashboard.css"; // Ensure your CSS is correctly linked
 import config from "../../src/config/config.json";
+//Delete Window
+import DeleteWindow from './DeleteWindow';
 
 // import XLSX from "xlsx";
 import * as XLSX from "xlsx";
@@ -22,8 +24,8 @@ const User = () => {
 
   // State for image
   const [newPath, setNewPath] = useState(null); // Initialize as null
-  const [uploadStatus, setUploadStatus] = useState('');
-
+  const [uploadStatus, setUploadStatus] = useState("");
+  const [imageToRemove, setImageToRemove] = useState([]); //track the delete image name
   // State for update user
   const [editId, setEditId] = useState(null); // Track which ID is being edited
   const [editName, setEditName] = useState(""); // Track edited name
@@ -31,8 +33,9 @@ const User = () => {
   const [editPath, setEditPath] = useState("");
   const [showUpdateForm, setshowUpdateForm] = useState(false);
 
-
-
+  //Delte User
+  const [isDeleteWindowOpen, setIsDeleteWindowOpen] = useState(false);
+  const [userIdToDelete, setUserIdToDelete] = useState(null);
 
   // Resetting add user form
   const resetAddUserForm = () => {
@@ -60,10 +63,9 @@ const User = () => {
   const getAllData = async () => {
     try {
       const response = await axios.get("https://localhost:7236/api/firstApi");
-      console.log("response from getAllData --------->", response);
+      // console.log("response from getAllData --------->", response);
       setTableData(response.data);
-      console.log("response from setTableData --------->", tableData);
-
+      // console.log("response from setTableData --------->", tableData);
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Failed to fetch users.");
@@ -82,8 +84,8 @@ const User = () => {
       );
 
       const userId = response.data.id; // Get the newly created user's ID
-      console.log("new user response---->",response.data);
-      console.log("new User Id--------->" ,userId);
+      // console.log("new user response---->", response.data);
+      // console.log("new User Id--------->", userId);
       // Upload the file for the new user using the userId
       await handleUpload(userId);
 
@@ -100,7 +102,7 @@ const User = () => {
     }
   };
 
-  // Function to delete a user by ID
+  
   const deleteDataById = async (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this user?"
@@ -119,8 +121,8 @@ const User = () => {
 
   // Function to update a user by ID
   const updateDataById = async (id) => {
-    if(editPath != null){
-      await handleUpload(id);;
+    if (editPath != null) {
+      await handleUpload(id);
     }
 
     try {
@@ -128,16 +130,22 @@ const User = () => {
         id,
         name: editName,
         description: editDesc,
-        path: editPath || '' // Preserve existing path or update as needed
+        path: editPath || "", // Preserve existing path or update as needed
       };
       await axios.put(
         `https://localhost:7236/api/firstApi/update/${id}`,
         updatedData
       );
+      await axios.delete(
+        `https://localhost:7236/api/firstApi/deleteImage/${imageToRemove}`,
+        updatedData
+      );
       setTableData((prevData) =>
         prevData.map((item) => (item.id === id ? updatedData : item))
       );
+      // await axios.delete(`https://localhost:7236/api/firstApi/${id}`);
       toast.success("User updated successfully!"); // Show success message
+      setImageToRemove("");
       resetUpdateForm(); // Reset the update form fields after updating
       // setEditPath("");
     } catch (error) {
@@ -155,26 +163,54 @@ const User = () => {
       // If editing a user, set the editPath to the new file
       setEditPath(file);
     }
-    console.log("Selected file:", file);
-    
+    // console.log("Selected file:", file);
   };
+
+  //Function to delete images
+  const handleRemoveImage = (indexToRemove) => {
+    const itemToEdit = tableData.find((item) => item.id === editId);
+    if (!itemToEdit) return; // Exit if item is not found
+
+    const imageArray = itemToEdit.path.split(",");
+
+    // Copy the name of the image to be removed
+    const removedImage = imageArray[indexToRemove];
+    setImageToRemove(removedImage); // Track the removed image
+
+    // Create the updated images string, excluding the image to remove
+    const updatedImages = imageArray
+      .filter((_, index) => index !== indexToRemove)
+      .join(",");
+
+    // Now update the tableData or editPath with the updated images
+    setEditPath(updatedImages);
+    setTableData((prevData) =>
+      prevData.map((item) =>
+        item.id === editId ? { ...item, path: updatedImages } : item
+      )
+    );
+
+    console.log("Image to remove:", removedImage);
+    console.log("Updated images after deleting:", updatedImages);
+    console.log("Table data after deleting images:", tableData);
+  };
+
 
   // Function to handle file upload
 
   const handleUpdateSubmit = (e) => {
     e.preventDefault(); // Prevent default form submission
     updateDataById(editId); // Call the existing update function
-};
-
+  };
 
   const handleUpload = async (userId) => {
     if (!newPath) {
-      setUploadStatus('Please select a file first.');
+      setUploadStatus("Please select a file first.");
       return;
     }
 
     const formData = new FormData();
-    formData.append('file', newPath); // Append the selected file
+    formData.append("file", newPath); // Append the selected file
 
     try {
       // Make an API call to the backend with the provided userId
@@ -183,20 +219,20 @@ const User = () => {
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         }
       );
 
       if (response.status === 204) {
-        setUploadStatus('File uploaded successfully!');
+        setUploadStatus("File uploaded successfully!");
         // Optionally, refresh the user data to display the uploaded image
         getAllData();
       }
     } catch (error) {
-      console.error('Error uploading the file:', error);
-      setUploadStatus('Failed to upload the file. Please try again.');
-      toast.error('Failed to upload the file.');
+      console.error("Error uploading the file:", error);
+      setUploadStatus("Failed to upload the file. Please try again.");
+      toast.error("Failed to upload the file.");
     }
   };
 
@@ -209,14 +245,18 @@ const User = () => {
       <td>
         {
           // Split the images string into an array and display all images
-          item.path && item.path.split(",").map((image, idx) => (
-            <img
-              key={idx}
-              src={`${config.uploadsFilePath}${image}`}
-              alt={`Image ${idx + 1}`}
-              style={{ margin: "5px", width: "15%" }}
-            />
-          ))
+          item.path &&
+            item.path
+              .split(",")
+              .map((image, idx) => (
+                <img
+                  className="table-img"
+                  key={idx}
+                  src={`${config.uploadsFilePath}${image}`}
+                  alt={`Image ${idx + 1}`}
+                  style={{ margin: "5px", width: "15%" }}
+                />
+              ))
         }
       </td>
       <td>
@@ -245,15 +285,14 @@ const User = () => {
   ));
 
   //Export data
-  const handleOnExport = () =>{
-      var wb = XLSX.utils.book_new(),
+  const handleOnExport = () => {
+    var wb = XLSX.utils.book_new(),
       ws = XLSX.utils.json_to_sheet(tableData);
 
-      XLSX.utils.book_append_sheet(wb,ws,"UserSheet");
+    XLSX.utils.book_append_sheet(wb, ws, "UserSheet");
 
-      XLSX.writeFile(wb,"UserExcel.xlsx");
-  }
-
+    XLSX.writeFile(wb, "UserExcel.xlsx");
+  };
 
   const generatePDF = () => {
     const input = document.getElementById("user-table"); // Get the table by ID
@@ -265,7 +304,7 @@ const User = () => {
     html2canvas(input)
       .then((canvas) => {
         const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdf = new jsPDF("p", "mm", "a4");
         const imgWidth = 210; // A4 width in mm
         const pageHeight = 297; // A4 height in mm
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
@@ -289,8 +328,6 @@ const User = () => {
         toast.error("Failed to generate PDF.");
       });
   };
-
-
 
   return (
     <div>
@@ -423,7 +460,12 @@ const User = () => {
               <div className="card">
                 <div className="card-header">
                   <h2>All Users</h2>
-                  <button onClick={() => setShowAddUserForm(!showAddUserForm)}>
+                  <button
+                    onClick={() => {
+                      setShowAddUserForm(!showAddUserForm);
+                      setEditId(null); // Close the update form when opening the add form
+                    }}
+                  >
                     {showAddUserForm ? "Close Form" : "Create New User"}{" "}
                     <span className="las la-user"></span>
                   </button>
@@ -433,7 +475,7 @@ const User = () => {
                 </div>
 
                 {/* Add User Form */}
-                {showAddUserForm && (
+                {showAddUserForm && !editId && (
                   <div
                     className={`card-body add-user-form ${
                       showAddUserForm ? "visible" : "hidden"
@@ -514,16 +556,41 @@ const User = () => {
                             required
                           />
                         </div>
+
+                        <div className="form-field">
+                          <label>Images</label>
+                          {tableData
+                            .filter((item) => item.id === editId) // Match tableData.ID with editId
+                            .map((item) =>
+                              item.path
+                                ? item.path.split(",").map((image, idx) => (
+                                    <div className="image-container" key={idx}>
+                                      <img
+                                        src={`${config.uploadsFilePath}${image}`}
+                                        alt={`Image ${idx + 1}`}
+                                        style={{ margin: "5px", width: "15%" }}
+                                      />
+                                      {<h4>{idx+1}</h4>}
+                                      <span
+                                        className="remove-image"
+                                        onClick={() => handleRemoveImage(idx)}
+                                      >
+                                        &times;
+                                      </span>
+                                    </div>
+                                  ))
+                                : null
+                            )}
+                        </div>
+
                         <div className="form-field">
                           <label htmlFor="file">File</label>
                           <input
                             type="file"
                             id="file"
                             onChange={handleFileChange} // Removed 'value'
-                            
                           />
                         </div>
-                       
                       </div>
                       <div className="form-actions">
                         <button type="submit" className="btn btn-primary">

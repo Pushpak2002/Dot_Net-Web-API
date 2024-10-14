@@ -14,10 +14,12 @@ namespace WebApplication1.Controllers
     {
 
         private readonly ApplicationDbContext _db;
+        private readonly IWebHostEnvironment _env;
 
-        public firstController(ApplicationDbContext db)
+        public firstController(ApplicationDbContext db, IWebHostEnvironment env)
         {
             _db = db;
+            _env = env;
         }
 
 
@@ -185,6 +187,33 @@ namespace WebApplication1.Controllers
             //return Ok(new UploadController().Upload(file));
         }
 
+
+        //ImagesController
+        [HttpDelete("deleteImage/{imageName}")]
+        public async Task<IActionResult> DeleteImage(string imageName)
+        {
+            try
+            {
+                // Construct the full path to the image
+                var imagePath = Path.Combine(_env.ContentRootPath, "Uploads", imageName);
+                //Console.WriteLine("imagePath------->", imagePath);
+                // Check if the file exists
+                if (System.IO.File.Exists(imagePath))
+                {
+                    // Delete the file
+                    System.IO.File.Delete(imagePath);
+                    return Ok(new { message = "Image deleted successfully." });
+                }
+                else
+                {
+                    return NotFound(new { message = "Image not found." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error deleting image.", error = ex.Message });
+            }
+        }
 
 
 
