@@ -25,7 +25,7 @@ namespace WebApplication1.Controllers
 
         // Get all Records
 
-        [HttpGet(Name = "GetAllData")]
+        [HttpGet("GetAllData" ,Name = "GetAllData")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<firstModel>> getfirst()
         {
@@ -63,7 +63,9 @@ namespace WebApplication1.Controllers
 
 
         // Add new records 
-        [HttpPost]
+        //[HttpPut("uploadFile/{id}", Name = "UploadFile")]
+
+        [HttpPost("addUser")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
         public ActionResult<firstModel> AddFirst([FromBody] firstModel _first)
@@ -104,7 +106,7 @@ namespace WebApplication1.Controllers
 
         // Delete Data
 
-        [HttpDelete("{id:int}", Name = "DeleteById")]
+        [HttpDelete("delete/{id:int}", Name = "DeleteById")]
         public IActionResult DeleteFirst(int id)
         {
             if (id == 0)

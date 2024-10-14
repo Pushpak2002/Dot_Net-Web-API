@@ -1,4 +1,3 @@
-// DeleteWindow.js
 import React from 'react';
 
 const DeleteWindow = ({ isOpen, onClose, onDelete, userId }) => {
@@ -7,11 +6,13 @@ const DeleteWindow = ({ isOpen, onClose, onDelete, userId }) => {
   return (
     <div className="delete-window-overlay">
       <div className="delete-window">
-        <h2>Confirm Deletion</h2>
-        <p>Are you sure you want to delete this user?</p>
+        <img className="delete-img" src={require("../assets/delete_mark.jpg")}
+                  alt="delete image"/>
+        <h2>Are You Sure?</h2>
+        <p>You won't be able to revert this!</p>
         <div className="delete-window-buttons">
-          <button onClick={() => onDelete(userId)}>Yes, Delete</button>
-          <button onClick={onClose}>Cancel</button>
+          <button className="yes" onClick={() => onDelete(userId)} >Yes, Delete!</button>
+          <button className="cancel" onClick={onClose} >Cancel</button>
         </div>
       </div>
     </div>

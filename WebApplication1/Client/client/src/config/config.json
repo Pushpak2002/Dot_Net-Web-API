@@ -1,3 +1,12 @@
 {
-  "uploadsFilePath": "https://localhost:7236/Uploads/"
+
+  "uploadsFilePath": "https://localhost:7236/Uploads/",
+  "main_api":"https://localhost:7236/api/firstApi/",
+  "getAllData": "GetAllData",
+  "addUser": "addUser",
+  "deleteUser":"delete/",
+  "updateUser":"update/",
+  "deleteImage":"deleteImage/",
+  "uploadFile": "uploadFile/"
+  
 }

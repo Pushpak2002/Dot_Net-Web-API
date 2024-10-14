@@ -2,19 +2,14 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify"; // Import ToastContainer and toast
 import "react-toastify/dist/ReactToastify.css";
-// import { Link } from 'react-router-dom';
 import "./css/Dashboard.css"; // Ensure your CSS is correctly linked
 import config from "../../src/config/config.json";
-//Delete Window
-import DeleteWindow from './DeleteWindow';
-
-// import XLSX from "xlsx";
+import DeleteWindow from "./DeleteWindow";  //Delete Window
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
 const User = () => {
-  // State variables
   const [tableData, setTableData] = useState([]); // Save all user info
 
   // State for new user
@@ -27,6 +22,7 @@ const User = () => {
   const [uploadStatus, setUploadStatus] = useState("");
   const [imageToRemove, setImageToRemove] = useState([]); //track the delete image name
   // State for update user
+
   const [editId, setEditId] = useState(null); // Track which ID is being edited
   const [editName, setEditName] = useState(""); // Track edited name
   const [editDesc, setEditDesc] = useState(""); // Track edited description
@@ -34,7 +30,7 @@ const User = () => {
   const [showUpdateForm, setshowUpdateForm] = useState(false);
 
   //Delte User
-  const [isDeleteWindowOpen, setIsDeleteWindowOpen] = useState(false);
+  const [isDeleteWindowOpen, setDeleteWindowOpen] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState(null);
 
   // Resetting add user form
@@ -62,7 +58,8 @@ const User = () => {
   // Function to fetch all users
   const getAllData = async () => {
     try {
-      const response = await axios.get("https://localhost:7236/api/firstApi");
+      const response = await axios.get(`${config.main_api}${config.getAllData}`);
+
       // console.log("response from getAllData --------->", response);
       setTableData(response.data);
       // console.log("response from setTableData --------->", tableData);
@@ -79,21 +76,15 @@ const User = () => {
     try {
       const newUser = { name: newName, description: newDesc, path: "" };
       const response = await axios.post(
-        "https://localhost:7236/api/firstApi",
+        `${config.main_api}${config.addUser}`,
         newUser
       );
 
       const userId = response.data.id; // Get the newly created user's ID
-      // console.log("new user response---->", response.data);
-      // console.log("new User Id--------->", userId);
-      // Upload the file for the new user using the userId
+      
       await handleUpload(userId);
-
-      // Update the table data state with the new user
-      setTableData((prevData) => [...prevData, response.data]);
-
-      // Reset form fields after adding
-      resetAddUserForm();
+      setTableData((prevData) => [...prevData, response.data]);  // Update the table data state with the new user
+      resetAddUserForm();// Reset form fields after adding
       setNewPath(null);
       toast.success("New User Added!");
     } catch (error) {
@@ -102,15 +93,26 @@ const User = () => {
     }
   };
 
-  
+  //Deleting data
+  const handleDelete = (userId) => {
+    setUserIdToDelete(userId);
+    setDeleteWindowOpen(true);
+  };
+  const cancelDelete = () => {
+    setDeleteWindowOpen(false);
+  };
+
+  const confirmDelete = async () => {
+    
+    deleteDataById(userIdToDelete); // Perform delete action here using userIdToDelete
+    setDeleteWindowOpen(false); // Close the modal after confirmation
+  };
+
   const deleteDataById = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this user?"
-    );
-    if (!confirmDelete) return; // Exit if the user cancels
+
 
     try {
-      await axios.delete(`https://localhost:7236/api/firstApi/${id}`);
+      await axios.delete(`${config.main_api}${config.deleteUser}${id}`);
       setTableData((prevData) => prevData.filter((item) => item.id !== id)); // Remove deleted item from state
       toast.success("User deleted successfully!");
     } catch (error) {
@@ -133,24 +135,27 @@ const User = () => {
         path: editPath || "", // Preserve existing path or update as needed
       };
       await axios.put(
-        `https://localhost:7236/api/firstApi/update/${id}`,
+        `${config.main_api}${config.updateUser}${id}`,
         updatedData
       );
-      await axios.delete(
-        `https://localhost:7236/api/firstApi/deleteImage/${imageToRemove}`,
-        updatedData
-      );
+      if(imageToRemove != "")
+      {
+        await axios.delete(
+          `${config.main_api}${config.deleteImage}${imageToRemove}`
+        );
+      }
       setTableData((prevData) =>
         prevData.map((item) => (item.id === id ? updatedData : item))
       );
-      // await axios.delete(`https://localhost:7236/api/firstApi/${id}`);
       toast.success("User updated successfully!"); // Show success message
       setImageToRemove("");
       resetUpdateForm(); // Reset the update form fields after updating
-      // setEditPath("");
+      setshowUpdateForm(false);
     } catch (error) {
-      console.error("Error updating data:", error);
+      setshowUpdateForm(false);
+      console.error("Error updating dataaa:", error);
       toast.error("Failed to update user.");
+      
     }
   };
 
@@ -173,7 +178,6 @@ const User = () => {
 
     const imageArray = itemToEdit.path.split(",");
 
-    // Copy the name of the image to be removed
     const removedImage = imageArray[indexToRemove];
     setImageToRemove(removedImage); // Track the removed image
 
@@ -190,11 +194,10 @@ const User = () => {
       )
     );
 
-    console.log("Image to remove:", removedImage);
-    console.log("Updated images after deleting:", updatedImages);
-    console.log("Table data after deleting images:", tableData);
+    // console.log("Image to remove:", removedImage);
+    // console.log("Updated images after deleting:", updatedImages);
+    // console.log("Table data after deleting images:", tableData);
   };
-
 
   // Function to handle file upload
 
@@ -215,7 +218,7 @@ const User = () => {
     try {
       // Make an API call to the backend with the provided userId
       const response = await axios.put(
-        `https://localhost:7236/api/firstApi/uploadFile/${userId}`,
+        `${config.main_api}${config.uploadFile}${userId}`,
         formData,
         {
           headers: {
@@ -276,10 +279,16 @@ const User = () => {
       <td>
         <button
           className="btn btn-danger p-2 m-2"
-          onClick={() => deleteDataById(item.id)}
+          onClick={() => handleDelete(item.id)}
         >
           Delete
         </button>
+        <DeleteWindow
+          isOpen={isDeleteWindowOpen}
+          onDelete={confirmDelete}
+          onClose={cancelDelete}
+          userId={userIdToDelete}
+        />
       </td>
     </tr>
   ));
@@ -570,7 +579,7 @@ const User = () => {
                                         alt={`Image ${idx + 1}`}
                                         style={{ margin: "5px", width: "15%" }}
                                       />
-                                      {<h4>{idx+1}</h4>}
+                                      
                                       <span
                                         className="remove-image"
                                         onClick={() => handleRemoveImage(idx)}
